@@ -1,19 +1,21 @@
 class player_class
 {
-    constructor(x,y,image_change,check_star)
+    constructor(x,y,image_change,check_star,img_bg)
     {
         this.x = x;
         this.y = y;
         this.image_change = image_change;
-        this.point;
+        this.point = 0;
         this.check_star = check_star;
         this.star_arr=[];
-        this.star_num = random(3,8);
-        this.exist = 0;
+        this.total_star = random(100);
         this.change_move = 0;
+        this.bg = img_bg;
+        this.base_star = random(3,8);
+        
     }
 
-    image(player_left,player_right, defence_left,defence_right )
+    image(player_left,player_right, defence_left,defence_right ,zet_left,zet_right)
     {
         //player
         if(this.image_change == 0)
@@ -38,6 +40,16 @@ class player_class
             }else if(this.change_move == 1) //right
             {
                 image(defence_right,this.x,this.y);
+            }
+        }else if(this.image_change == 2) //zet_player
+        {
+            if(this.change_move == 0) //left
+            {
+                image(zet_left,this.x,this.y);
+
+            }else if(this.change_move == 1) //right
+            {
+                image(zet_right,this.x,this.y);
             }
         }
     }
@@ -95,57 +107,92 @@ class player_class
         }
     }
 
+    zet()
+    {
+        if(keyCode == 65)
+        {
+            this.image_change = 2;
+        }
+    }
+
+    create_star()
+    {
+        for(let i = 0; i <= this.total_star; i++)
+        {
+            let coordinate = 
+            {
+                x : random(width-250),
+                y : random(height-40),
+                z : 0
+            };
+            this.star_arr.push(coordinate);
+        }
+    }
+
     star_image(img_star,millisecond)
     {
-        
-        if(this.check_star == 0)
-        {
-            for(let i = 0; i <= this.star_num; i++)
-            {
-                let coordinate = 
-                {
-                    x : random(width-250),
-                    y : random(height-40),
-                    z : this.exist
-                };
-                this.star_arr.push(coordinate);
-            }
-            this.check_star = 1;
-        }
-
-        for (let j = 0; j < this.star_arr.length; j++)
+        for (let j = 0; j < this.base_star; j++)
         {   
             if(this.star_arr[j].z == 0)
             {
+                this.star_arr[j].z = 1;
+            }
+            if(this.star_arr[j].z == 1)
+            {
                 image(img_star, this.star_arr[j].x,this.star_arr[j].y);
             }
-            //console.log(this.star_arr[j].z);
         }
-    
-        // if (millisecond > 5000)
-        // {
-        //     this.star_arr.push(coordinate);
-        //     image(img_star, this.star_arr[this.star_num+1].x,this.star_arr[this.star_num+1].y);
-        // }
-        // if (millisecond > 2000)
-        // {
-        //     this.star_arr.push(coordinate);
-        //     image(img_star, this.star_arr[this.star_num].x,this.star_arr[this.star_num].y);
-        // }
-
     }
 
     star_collision()
     {
         for (let i =0; i < this.star_arr.length; i++)
         {
-            if((this.x + 30 - this.star_arr[i].x+20)*(this.x+30 - this.star_arr[i].x+20)+(this.y+30 - this.star_arr[i].y+20)*(this.y+30 - this.star_arr[i].y+20) <= 61*61)
+            if(this.star_arr[i].z == 1)
             {
-                console.log("부딫힘");
-                this.star_arr[i].z = 1;
+                if(dist(this.x+40,this.y+40,this.star_arr[i].x+20,this.star_arr[i].y+20)<=60)
+                {
+                    this.star_arr[i].z = 2;
+                }
             }
         }
-        
     }
-}    
+
+    count_point()
+    {
+        for (let i =0; i < this.star_arr.length; i++)
+        {
+            if(this.star_arr[i].z == 2)
+            {
+                this.star_arr[i].z = 3;
+                this.point += 100;
+                console.log(this.star_arr[0].z);
+            }
+        }
+        push();
+        fill(255);
+        textSize(40);
+        text("POINT : "+this.point,20,50);
+        pop();
+    }
+
+    change_background()
+    {
+        
+        if(this.point == 200)
+        {
+            return this.bg = img_background_1000;
+
+        }else if(this.point == 300)
+        {
+            return this.bg = img_background_2000;
+
+        }else if(this.point == 400)
+        {
+            return this.bg = img_background_3000;
+            
+        }
+    }
+}
+    
 
