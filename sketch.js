@@ -3,6 +3,7 @@
 // Course     : CS099
 // Spring 2021
 
+let music;
 //background_img
 let img_bg;
 let img_main_menu_bg;
@@ -100,6 +101,7 @@ let CURRENT_SCREEN = MAIN_MENU;
 
 function preload()
 {
+    music = loadSound('media/01 Adventure Awaits (LOOP).wav');
     //background
     img_background = loadImage('media/basic_background.jpg');
     img_main_menu_bg = loadImage('media/main_menu.jpg');
@@ -186,6 +188,13 @@ function preload()
 
 function setup()
 {
+    if(!music.isLoaded())
+    {
+        music=loadSound('media/01 Adventure Awaits (LOOP).wav');
+    }
+    music.play();
+    music.setVolume(0.5);
+
     createCanvas( 1200,800 );
     img_bg = img_background;
 
@@ -226,6 +235,11 @@ function setup()
 
 function draw()
 {
+    if(!music.isPlaying())
+    {
+        music.play();
+        music.setVolume(0.5);
+    }
     //console.log(CURRENT_SCREEN);
     switch(CURRENT_SCREEN)
     {
@@ -773,7 +787,7 @@ function draw()
     // STAGE_1_SCREEN ***
     if(CURRENT_SCREEN == STAGE_1_SCREEN)
     {
-        if(player1.point == 2) // player star 다 모았을 때
+        if(player1.point == 10) // player star 다 모았을 때
         {
             CURRENT_SCREEN = MONSTER_1_SCREEN;
 
@@ -797,7 +811,7 @@ function draw()
     }//STAGE 2 ***
     else if(CURRENT_SCREEN == STAGE_2_SCREEN)
     {
-        if(player2.point == 2) // player star 다 모았을 때
+        if(player2.point == 10) // player star 다 모았을 때
         {
             CURRENT_SCREEN = MONSTER_2_SCREEN;
 
@@ -823,7 +837,7 @@ function draw()
     //STAGE 3 ***
     }else if(CURRENT_SCREEN == STAGE_3_SCREEN)
     {
-        if(player3.point == 2) // player star 다 모았을 때
+        if(player3.point == 10) // player star 다 모았을 때
         {
             CURRENT_SCREEN = MONSTER_3_SCREEN;
 

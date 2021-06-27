@@ -73,17 +73,38 @@ Spring 2021
             noStroke();
             rect(this.gauge_x+this.gauge_change_x,7,this.gauge_length,40);
         ```
-### 3. Variables : 
+### 3. Variables
+    Variables show what properties are in the object I want to create. This can be useful in creating functions. So I think it is important to name variables.
 - Variables used by player_class
     - Variables related to the movement of player characters
         - x , y : The current x and y coordinates of the player.
         - previous_x : The player's previous x-coordinates.
-- Variables used by planet_class
-    - d
-- Variables used by monster_class
-    - d
+        - base_star : The number of stars on the first screen.
 
-### 4. Conditional Statements : 
+        ```javascript
+            //Received x,y from the constructor.
+            this.x = x;
+            this.y = y;
+            this.base_star = 1;
+        ```
+- Variables used by planet_class
+    - setup_explosion_time : The time interval at which the planet explodes.
+
+    
+        ```javascript
+            //Received setup_explosion_time from the constructor.
+           this.setup_explosion_time = setup_explosion_time;
+        ```
+- Variables used by monster_class
+    - num_particles : The number of particles produced when a bomb explodes.
+
+        ```javascript
+            //Received num_particles from the constructor.
+           this.num_particles = num_particles;
+        ```
+
+### 4. Conditional Statements
+    Since code is executed every frame, conditional statements can be made when to execute code that is not always supposed to be executed. Conditional statements must meet the conditions before they can be executed. Therefore, conditional statements were all used that should be implemented only in certain circumstances. For example, move the player to the left only when the left side of the rudder is pressed.
 - Conditional Statements used by player_class
     - Conditional statements that change the player's direction and move the player according to the direction key you press : When the user presses the up or down direction key, the speed value of the player is subtracted or added to the y variable, and when the left or right direction key is pressed, the speed value is subtracted or added to the x variable.
         ```javascript
@@ -152,6 +173,7 @@ Spring 2021
                 }
         ```
 ### 6. Functions
+    
 - Functions used by player_class
     - player_image : A function that changes the player's image according to the player's movement.
         ```javascript

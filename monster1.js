@@ -175,7 +175,7 @@ class monster_class
         {
             for(let i=0; i<player.shooting_location_arr.length; i++)
             {
-                if(dist(player.shooting_location_arr[i].x,player.shooting_location_arr[i].y,this.x+150,this.y+150)<=165)
+                if(dist(player.shooting_location_arr[i].x,player.shooting_location_arr[i].y,this.x+155,this.y+90)<=105)
                 {
                     player.shooting_location_arr.splice(i,1);
 
@@ -193,7 +193,7 @@ class monster_class
         {
             for(let i=0; i<player.jet_shooting_arr.length; i++)
             {
-                if(dist(player.jet_shooting_arr[i].x,player.jet_shooting_arr[i].y,this.x+150,this.y+150)<=160)
+                if(dist(player.jet_shooting_arr[i].x,player.jet_shooting_arr[i].y,this.x+155,this.y+90)<=100)
                 {
                     player.jet_shooting_arr.splice(i,1);
 
