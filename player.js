@@ -1,60 +1,90 @@
+// Name       : Yeaseul Lim
+// Assignment : Make a Game
+// Course     : CS099
+// Spring 2021
+
 class player_class
 {
-    constructor(x,y,img_bg)
+    constructor(x,y)
     {
         //player
         this.x = x;
         this.y = y;
         this.image_change =0
         this.change_move = 0;
-        this.current_x =x;
+        this.previous_x =x;
         this.speed = 3;
+        this.checkDir = 0;
+
         //star
         this.point = 0;
         this.star_arr=[];
-        this.total_star = floor(random(50,70));
-        this.bg = img_bg;
-        this.base_star = floor(random(10,15));
+        this.total_star = 10;
+        this.base_star = 1;
         this.star_check_move = 0; //Control star movement according to player's movement
+        this.new_star_time=0;
+
         //defence
         this.num_defence = 0;
         this.defence_arr=[];
-        this.total_defence = floor(random(30,50));
-        this.base_defence = floor(random(5,7));
+        this.total_defence = 20;
+        this.base_defence = 3;
         this.defence_check_move = 0; //Control defence movement according to player's movement
         this.defence_time = 10;
         this.check_defence_num = 0;
         this.defence_frame = 0;
         this.check_defence_frame = 0;
-        //zet
-        this.num_zet = 0;
-        this.zet_arr=[];
-        this.total_zet = floor(random(30,50));
-        this.base_zet = floor(random(5,7));
-        this.zet_check_move = 0; //Control zet movement according to player's movement
-        this.zet_time = 10;
-        this.check_zet_num = 0;
-        this.zet_frame = 0;
-        this.check_zet_frame = 0;
+        this.new_defence_time=0;
+        this.check_add_defence_arr=0;
+
+        //jet
+        this.num_jet = 0;
+        this.jet_arr=[];
+        this.total_jet = 20;
+        this.base_jet = 3;
+        this.jet_check_move = 0; //Control jet movement according to player's movement
+        this.jet_time = 10;
+        this.check_jet_num = 0;
+        this.jet_frame = 0;
+        this.check_jet_frame = 0;
+        this.new_jet_time=0;
+        this.check_add_jet_arr=0;
 
         //shooting
         this.num_shot = 50;
         this.shot_arr=[];
-        this.total_shot =floor(random(30,50));
-        this.base_shot = floor(random(5,7));
-        this.shot_check_move = 0; //Control zet movement according to player's movement
-        this.shot_time = 10;
+        this.total_shot =30;
+        this.base_shot = 3;
+        this.shot_check_move = 0; //Control jet movement according to player's movement
         this.check_shot_num = 0;
         this.shot_frame = 0;
         this.check_shot_frame = 0;
+        this.jet_shooting_arr =[];
+        this.new_shot_time=0;
+        this.check_add_shot_arr=0;
 
         //attack
         this.shooting_location_arr=[];
         this.shot_speed = new Vec2(8,0);
+
+        //gauge
+        this.gauge_length=530;
+        this.gauge_x=650;
+        this.gauge_score=100;
+        this.gauge_change_x=530-this.gauge_length;
+
+        this.check_player_planet_collision=0;
+        this.planet_collision_i;
+        this.check_planet_collision_i=0;
+
+        this.check_player_bomb_collision=0;
+        this.bomb_collision_i;
+        this.check_bomb_collision_i = 0;
+
     }
 
     
-    player_image(player_left,player_right, defence_left,defence_right ,zet_left,zet_right ,shooting_left,shooting_right, defence_shooting_left,defence_shooting_right, zet_shooting_left,zet_shooting_right)
+    player_image(player_left,player_right, defence_left,defence_right ,jet_left,jet_right ,shooting_left,shooting_right, defence_shooting_left,defence_shooting_right, jet_shooting_left,jet_shooting_right)
     {
         //player
         if(this.image_change == 0)
@@ -67,9 +97,8 @@ class player_class
             {
                 image(player_right,this.x,this.y);
             }
-        }
         
-        if(this.image_change == 1) //defence_player
+        }else if(this.image_change == 1) //defence_player
         {
             if(this.change_move == 0) //left
             {
@@ -79,15 +108,15 @@ class player_class
             {
                 image(defence_right,this.x,this.y);
             }
-        }else if(this.image_change == 2) //zet_player
+        }else if(this.image_change == 2) //jet_player
         {
             if(this.change_move == 0) //left
             {
-                image(zet_left,this.x,this.y);
+                image(jet_left,this.x,this.y);
 
             }else if(this.change_move == 1) //right
             {
-                image(zet_right,this.x,this.y);
+                image(jet_right,this.x,this.y);
             }
         }else if(this.image_change == 3) //shooting_player
         {
@@ -109,15 +138,15 @@ class player_class
             {
                 image(defence_shooting_right,this.x,this.y);
             }
-        }else if(this.image_change == 5) //zet_shooting_player
+        }else if(this.image_change == 5) //jet_shooting_player
         {
             if(this.change_move == 0) //left
             {
-                image(zet_shooting_left,this.x,this.y);
+                image(jet_shooting_left,this.x,this.y);
 
             }else if(this.change_move == 1) //right
             {
-                image(zet_shooting_right,this.x,this.y);
+                image(jet_shooting_right,this.x,this.y);
             }
         }
 
@@ -125,47 +154,51 @@ class player_class
 
     player_move()
     {
-        if(this.star_check_move == 0 && this.defence_check_move ==0 && this.zet_check_move ==0)
+        if(this.star_check_move == 0 && this.defence_check_move ==0 && this.jet_check_move ==0)  
         {
             if(keyIsDown(LEFT_ARROW))
             {
                 this.change_move = 0;
+                this.checkDir = 1;
                 if(this.x >= 20)
                 {
                     this.x -= this.speed;
-                    this.current_x = this.x+ this.speed;
+                    this.previous_x = this.x+ this.speed;
 
                     this.star_check_move = 1;
                     this.defence_check_move = 1;
-                    this.zet_check_move =1;
+                    this.jet_check_move =1;
                     this.shot_check_move = 1;
-                }else
+                   }else
                 {
                     this.star_check_move = 2;
                     this.defence_check_move = 2;
-                    this.zet_check_move =2;
+                    this.jet_check_move =2;
                     this.shot_check_move = 2;
-                }
+                   }
     
             }else if(keyIsDown(RIGHT_ARROW))
             {
                 this.change_move = 1;
+                this.checkDir = 2;
                 if(this.x + 80 <= width-20)
                 {
                     this.x += this.speed;
-                    this.current_x = this.x - this.speed;
+                    this.previous_x = this.x - this.speed;
 
                     this.star_check_move = 1;
                     this.defence_check_move = 1;
-                    this.zet_check_move =1;
+                    this.jet_check_move =1;
                     this.shot_check_move = 1;
-                }else
+                   }else
                 {
                     this.star_check_move = 2;
                     this.defence_check_move = 2;
-                    this.zet_check_move =2;
+                    this.jet_check_move =2;
                     this.shot_check_move = 2;
-                }
+                   }
+            }else{
+                this.checkDir = 0;
             }
         }
         if(keyIsDown(UP_ARROW))
@@ -190,7 +223,7 @@ class player_class
             }
         }
     
-        if(this.star_check_move == 2 || this.defence_check_move == 2 || this.zet_check_move == 2)
+        if(this.star_check_move == 2 || this.defence_check_move == 2 || this.jet_check_move == 2)
         {
             if(this.x <= 20 )
             {
@@ -199,15 +232,17 @@ class player_class
                     this.x = 20;
                     this.star_check_move =0;
                     this.defence_check_move = 0;
-                    this.zet_check_move =0;
+                    this.jet_check_move =0;
                     this.shot_check_move = 0;
+    
                 }
                 if(keyIsDown(LEFT_ARROW)&&keyIsDown(RIGHT_ARROW))
                 {
                     this.star_check_move =2;
                     this.defence_check_move = 2;
-                    this.zet_check_move =2;
+                    this.jet_check_move =2;
                     this.shot_check_move = 2;
+    
                 }
             }
             if(this.x+80 >= width-20)
@@ -217,12 +252,125 @@ class player_class
                     this.x = width-20-80;
                     this.star_check_move =0;
                     this.defence_check_move = 0;
-                    this.zet_check_move =0;
+                    this.jet_check_move =0;
                     this.shot_check_move = 0;
                 }
             }
         }
     }
+
+    monster_stage_player_move(monster)
+    {
+        if(this.defence_check_move ==0 && this.jet_check_move ==0 && monster.water_check_move == 0 || monster.bomb_check_move == 0)  
+        {
+            if(keyIsDown(LEFT_ARROW))
+            {
+                this.change_move = 0;
+                this.checkDir = 1;
+                if(this.x >= 20)
+                {
+                    this.x -= this.speed;
+                    this.previous_x = this.x+ this.speed;
+                    this.defence_check_move = 1;
+                    this.jet_check_move =1;
+                    this.shot_check_move = 1;
+                    monster.water_check_move = 1;
+                    monster.bomb_check_move = 1;
+                   }else
+                {
+                    this.defence_check_move = 2;
+                    this.jet_check_move =2;
+                    this.shot_check_move = 2;
+                    monster.water_check_move = 2;
+                    monster.bomb_check_move = 2;
+                   }
+    
+            }else if(keyIsDown(RIGHT_ARROW))
+            {
+                this.change_move = 1;
+                this.checkDir = 2;
+                if(this.x + 80 <= width-20)
+                {
+                    this.x += this.speed;
+                    this.previous_x = this.x - this.speed;
+                    this.defence_check_move = 1;
+                    this.jet_check_move =1;
+                    this.shot_check_move = 1;
+                    monster.water_check_move = 1;
+                    monster.bomb_check_move = 1;
+                   }else
+                {
+                    this.defence_check_move = 2;
+                    this.jet_check_move =2;
+                    this.shot_check_move = 2;
+                    monster.water_check_move = 2;
+                    monster.bomb_check_move = 2;
+                   }
+            }else{
+                this.checkDir = 0;
+            }
+        }
+        if(keyIsDown(UP_ARROW))
+        {
+            if(this.y >= 55)
+            {
+                this.y -= this.speed*1.5;
+            }else
+            {
+                this.y = 55;
+            }
+                
+        }
+        if(keyIsDown(DOWN_ARROW))
+        {
+            if(this.y + 80 <= height-55)
+            {
+                this.y += this.speed*1.5;
+            }else
+            {
+                this.y = height - 80-55;
+            }
+        }
+    
+        if(this.defence_check_move == 2 || this.jet_check_move == 2 || monster.water_check_move == 2 || monster.bomb_check_move == 2)
+        {
+            if(this.x <= 20 )
+            {
+                if(keyIsDown(RIGHT_ARROW))
+                {
+                    this.x = 20;
+                    this.defence_check_move = 0;
+                    this.jet_check_move =0;
+                    this.shot_check_move = 0;
+                    monster.water_check_move = 0;
+                    monster.bomb_check_move = 0;
+    
+                }
+                if(keyIsDown(LEFT_ARROW)&&keyIsDown(RIGHT_ARROW))
+                {
+                    this.defence_check_move = 2;
+                    this.jet_check_move =2;
+                    this.shot_check_move = 2;
+                    monster.water_check_move = 2;
+                    monster.bomb_check_move = 2;
+    
+                }
+            }
+            if(this.x+80 >= width-20)
+            {
+                if(keyIsDown(LEFT_ARROW))
+                {
+                    this.x = width-20-80;
+                    this.defence_check_move = 0;
+                    this.jet_check_move =0;
+                    this.shot_check_move = 0;
+                    monster.water_check_move = 0;
+                    monster.bomb_check_move = 0;
+                }
+            }
+        }
+    }
+
     
     change_player_img_defence()
     {
@@ -238,7 +386,7 @@ class player_class
         }
     }
 
-    show_defence_time()
+    show_defence_time(img_defence)
     {  
         if(this.image_change == 1 || this.image_change == 4)
         {
@@ -247,13 +395,9 @@ class player_class
                 this.num_defence -= 1;
                 this.check_defence_num =1;
             }
-            for(let i =500; i < 500 + this.defence_time*50; i+=50)
+            for(let i =280; i < 280 + this.defence_time*50; i+=50)
             {
-                push();
-                fill(255);
-                rect(i,753,40,40);
-                pop();
-                //console.log(this.defence_frame);
+                image(img_defence,i,753,40,40);
             }
 
             this.defence_frame += deltaTime/1000;
@@ -287,12 +431,58 @@ class player_class
         {
             let coordinate = 
             {
-                x : random(-1000,width-250),
+                x : random(-600,width-100),
                 y : random(55,height-40-55),
                 z : 0
             };
             this.defence_arr.push(coordinate);
         }
+    }
+
+    add_defence_arr()
+    {
+        if(this.base_defence%this.total_defence==0)
+        {
+            if(this.check_add_defence_arr==0)
+            {
+                for(let i =0; i<this.total_defence; i++)
+                {
+                    let coordinate = 
+                    {
+                        x : random(-600,width-100),
+                        y : random(55,height-40-55),
+                        z : 0
+                    };
+                    this.defence_arr.push(coordinate);
+                }
+                this.check_add_defence_arr=1;
+            }
+        }
+        if(this.base_defence%this.total_defence==2)
+        {
+            this.check_add_defence_arr=0;
+        }
+    }
+
+    create_new_defence()
+    {
+        var defence_num=0;
+        for(let i =0; i<this.defence_arr.length; i++)
+            {
+                if(this.defence_arr[i].z==1)
+                {
+                    defence_num+=1;
+                }
+            }
+        if(defence_num<3)
+        {
+            this.new_defence_time += deltaTime/1000;
+            if(this.new_defence_time > 3)
+            {
+                this.base_defence+=1;
+                this.new_defence_time=0;
+            }
+        } 
     }
 
     defence_image(img_defence)
@@ -305,7 +495,7 @@ class player_class
             }
             if(this.defence_arr[j].z == 1)
             {
-                image(img_defence, this.defence_arr[j].x,this.defence_arr[j].y);
+                image(img_defence, this.defence_arr[j].x,this.defence_arr[j].y,40,40);
             }
         }
     }
@@ -314,14 +504,14 @@ class player_class
     {
         if(this.defence_check_move == 1)
         {
-            if(this.x >= this.current_x) //player move right
+            if(this.x >= this.previous_x) //player move right
             {
                 for(let i =0; i<this.defence_arr.length; i++)
                 {
                     this.defence_arr[i].x -= this.speed;  //defence move left
                 }
                 this.defence_check_move = 0;
-            }else if(this.x <= this.current_x) //player move left
+            }else if(this.x <= this.previous_x) //player move left
             {
                 for(let i =0; i<this.defence_arr.length; i++)
                 {
@@ -346,7 +536,7 @@ class player_class
         }
     }
 
-    count_defence()
+    count_defence(img_defence)
     {
         for (let i =0; i < this.defence_arr.length; i++)
         {
@@ -359,15 +549,17 @@ class player_class
         push();
         fill(255);
         textSize(40);
-        text("DEFENCE : "+this.num_defence,20,height-10);
+        text(this.num_defence,85,height-12);
         pop();
+        image(img_defence,30,height-47,40,40);
+
     }
 
-    change_player_img_zet()
+    change_player_img_jet()
     {
         if(this.image_change == 0)
         {
-            if(this.num_zet > 0)
+            if(this.num_jet > 0)
             {
                 if(keyCode == 65)
                 {
@@ -377,128 +569,171 @@ class player_class
         }
     }
 
-    show_zet_time()
+    show_jet_time(img_jet)
     {   
         if(this.image_change == 2 || this.image_change == 5)
         {
-            if(this.check_zet_num == 0)
+            if(this.check_jet_num == 0)
             {
-                this.num_zet -= 1;
-                this.check_zet_num =1;
+                this.num_jet -= 1;
+                this.check_jet_num =1;
             }
-            for(let i =500; i < 500 + this.zet_time*50; i+=50)
+            for(let i =280; i < 280 + this.jet_time*50; i+=50)
             {
-                push();
-                fill(255);
-                rect(i,753,40,40);
-                pop();
+                image(img_jet,i,753,40,40);
             }
 
-             this.zet_frame += deltaTime/1000;
+             this.jet_frame += deltaTime/1000;
             
-            if(this.check_zet_frame <= 10 )
+            if(this.check_jet_frame <= 10 )
             {   
-                if(this.zet_frame >1)
+                if(this.jet_frame >1)
                 {
-                    if(this.zet_time > 0)
+                    if(this.jet_time > 0)
                     {
-                        this.zet_time -= 1;
-                        this.check_zet_frame +=1;
-                        this.zet_frame =0;
+                        this.jet_time -= 1;
+                        this.check_jet_frame +=1;
+                        this.jet_frame =0;
                     }
                 }
             }
-            if(this.zet_time == 0)
+            if(this.jet_time == 0)
             {
-                console.log(this.zet_time);
                 this.image_change = 0;
-                this.zet_time=10;
-                this.check_zet_frame=0;
-                this.check_zet_num =0;
+                this.jet_time=10;
+                this.check_jet_frame=0;
+                this.check_jet_num =0;
             }
         }
     }
 
-    create_zet()
+    create_jet()
     {
-        for(let i = 0; i <= this.total_zet; i++)
+        for(let i = 0; i <= this.total_jet; i++)
         {
             let coordinate = 
             {
-                x : random(-1000,width-250),
+                x : random(-600,width-100),
                 y : random(55,height-40-55),
                 z : 0
             };
-            this.zet_arr.push(coordinate);
+            this.jet_arr.push(coordinate);
         }
     }
 
-    zet_image(img_zet)
+    add_jet_arr()
     {
-        for (let j = 0; j < this.base_zet; j++)
+        if(this.base_jet%this.total_jet==0)
+        {
+            if(this.check_add_jet_arr==0)
+            {
+                for(let i =0; i<this.total_jet; i++)
+                {
+                    let coordinate = 
+                    {
+                        x : random(-600,width-100),
+                        y : random(55,height-40-55),
+                        z : 0
+                    };
+                    this.jet_arr.push(coordinate);
+                }
+                this.check_add_jet_arr=1;
+            }
+        }
+        if(this.base_jet%this.total_jet==2)
+        {
+            this.check_add_jet_arr=0;
+        }
+    }
+
+    create_new_jet()
+    {
+        var jet_num=0;
+        for(let i =0; i<this.jet_arr.length; i++)
+            {
+                if(this.jet_arr[i].z==1)
+                {
+                    jet_num+=1;
+                }
+            }
+        if(jet_num<3)
+        {
+            this.new_jet_time += deltaTime/1000;
+            if(this.new_jet_time > 3)
+            {
+                this.base_jet+=1;
+                this.new_jet_time=0;
+            }
+        } 
+    }
+
+    jet_image(img_jet)
+    {
+        for (let j = 0; j < this.base_jet; j++)
         {   
-            if(this.zet_arr[j].z == 0)
+            if(this.jet_arr[j].z == 0)
             {
-                this.zet_arr[j].z = 1;
+                this.jet_arr[j].z = 1;
             }
-            if(this.zet_arr[j].z == 1)
+            if(this.jet_arr[j].z == 1)
             {
-                image(img_zet, this.zet_arr[j].x,this.zet_arr[j].y);
-            }
-        }
-    }
-
-    zet_move()
-    {
-        if(this.zet_check_move == 1)
-        {
-            if(this.x >= this.current_x) //player move right
-            {
-                for(let i =0; i<this.zet_arr.length; i++)
-                {
-                    this.zet_arr[i].x -= this.speed;  //zet move left
-                }
-                this.zet_check_move = 0;
-            }else if(this.x <= this.current_x) //player move left
-            {
-                for(let i =0; i<this.zet_arr.length; i++)
-                {
-                    this.zet_arr[i].x += this.speed;  //zet move right
-                }
-                this.zet_check_move = 0;
+                image(img_jet, this.jet_arr[j].x,this.jet_arr[j].y,40,40);
             }
         }
     }
 
-    zet_collision()
+    jet_move()
     {
-        for (let i =0; i < this.zet_arr.length; i++)
+        if(this.jet_check_move == 1)
         {
-            if(this.zet_arr[i].z == 1)
+            if(this.x >= this.previous_x) //player move right
             {
-                if(dist(this.x+40,this.y+40,this.zet_arr[i].x+20,this.zet_arr[i].y+20)<=60)
+                for(let i =0; i<this.jet_arr.length; i++)
                 {
-                    this.zet_arr[i].z = 2;
+                    this.jet_arr[i].x -= this.speed;  //jet move left
+                }
+                this.jet_check_move = 0;
+            }else if(this.x <= this.previous_x) //player move left
+            {
+                for(let i =0; i<this.jet_arr.length; i++)
+                {
+                    this.jet_arr[i].x += this.speed;  //jet move right
+                }
+                this.jet_check_move = 0;
+            }
+        }
+    }
+
+    jet_collision()
+    {
+        for (let i =0; i < this.jet_arr.length; i++)
+        {
+            if(this.jet_arr[i].z == 1)
+            {
+                if(dist(this.x+40,this.y+40,this.jet_arr[i].x+20,this.jet_arr[i].y+20)<=60)
+                {
+                    this.jet_arr[i].z = 2;
                 }
             }
         }
     }
 
-    count_zet()
+    count_jet(img_jet)
     {
-        for (let i =0; i < this.zet_arr.length; i++)
+        for (let i =0; i < this.jet_arr.length; i++)
         {
-            if(this.zet_arr[i].z == 2)
+            if(this.jet_arr[i].z == 2)
             {
-                this.zet_arr[i].z = 3;
-                this.num_zet += 1;
+                this.jet_arr[i].z = 3;
+                this.num_jet += 1;
             }
         }
         push();
         fill(255);
         textSize(40);
-        text("ZET : "+this.num_zet,300,height-10);
+        text(this.num_jet,205,height-12);
         pop();
+        image(img_jet,150,height-47,40,40)
     }
 
     create_star()
@@ -507,7 +742,7 @@ class player_class
         {
             let coordinate = 
             {
-                x : random(-1000,width-250),
+                x : random(-500,width-100),
                 y : random(55,height-40-55),
                 z : 0
             };
@@ -530,18 +765,40 @@ class player_class
         }
     }
 
+    create_new_star()
+    {
+        var star_num=0;
+        for(let i =0; i<this.star_arr.length; i++)
+            {
+                if(this.star_arr[i].z==1)
+                {
+                    star_num+=1;
+                }
+            }
+        if(star_num<1)
+        {
+            this.new_star_time += deltaTime/1000;
+            if(this.new_star_time > 1)
+            {
+                this.base_star+=1;
+                this.new_star_time=0;
+            }
+        } 
+    }
+
     star_move()
     {
+
         if(this.star_check_move == 1)
         {
-            if(this.x >= this.current_x) //player move right
+            if(this.x >= this.previous_x) //player move right
             {
                 for(let i =0; i<this.star_arr.length; i++)
                 {
                     this.star_arr[i].x -= this.speed;  //star move left
                 }
                 this.star_check_move = 0;
-            }else if(this.x <= this.current_x) //player move left
+            }else if(this.x <= this.previous_x) //player move left
             {
                 for(let i =0; i<this.star_arr.length; i++)
                 {
@@ -566,39 +823,23 @@ class player_class
         }
     }
 
-    count_point()
+    count_point(img_star)
     {
         for (let i =0; i < this.star_arr.length; i++)
         {
             if(this.star_arr[i].z == 2)
             {
                 this.star_arr[i].z = 3;
-                this.point += 100;
+                this.point += 1;
+
             }
         }
         push();
         fill(255);
         textSize(40);
-        text("POINT : "+this.point,20,50);
+        text(this.point+" / 10",85,45);
         pop();
-    }
-
-    change_background()
-    {
-        
-        if(this.point == 200)
-        {
-            return this.bg = img_background_1000;
-
-        }else if(this.point == 300)
-        {
-            return this.bg = img_background_2000;
-
-        }else if(this.point == 400)
-        {
-            return this.bg = img_background_3000;
-            
-        }
+        image(img_star,30,7,40,40)
     }
 
     change_player_img_shooting()
@@ -632,7 +873,7 @@ class player_class
         }
     }
 
-    change_player_zet_img_shooting()
+    change_player_jet_img_shooting()
     {
         if(this.image_change == 2)
         {
@@ -655,7 +896,7 @@ class player_class
         {
             let coordinate = 
             {
-                x : random(-1000,width-250),
+                x : random(-600,width-100),
                 y : random(55,height-40-55),
                 z : 0
             };
@@ -663,6 +904,52 @@ class player_class
         }
     }
 
+    add_shot_arr()
+    {
+        if(this.base_shot%this.total_shot==0)
+        {
+            if(this.check_add_shot_arr==0)
+            {
+                for(let i =0; i<this.total_shot; i++)
+                {
+                    let coordinate = 
+                    {
+                        x : random(-600,width-100),
+                        y : random(55,height-40-55),
+                        z : 0
+                    };
+                    this.shot_arr.push(coordinate);
+                }
+                this.check_add_shot_arr=1;
+            }
+        }
+        if(this.base_shot%this.total_shot==2)
+        {
+            this.check_add_shot_arr=0;
+        }
+    }
+
+    create_new_shot()
+    {
+        var shot_num=0;
+        for(let i =0; i<this.shot_arr.length; i++)
+            {
+                if(this.shot_arr[i].z==1)
+                {
+                    shot_num+=1;
+                }
+            }
+        if(shot_num<3)
+        {
+            this.new_shot_time += deltaTime/1000;
+            if(this.new_shot_time > 3)
+            {
+                this.base_shot+=1;
+                this.new_shot_time=0;
+            }
+        } 
+    }
+    
     shooting_image(img_shot)
     {
         for (let j = 0; j < this.base_shot; j++)
@@ -682,14 +969,14 @@ class player_class
     {
         if(this.shot_check_move == 1)
         {
-            if(this.x >= this.current_x) //player move right
+            if(this.x >= this.previous_x) //player move right
             {
                 for(let i =0; i<this.shot_arr.length; i++)
                 {
                     this.shot_arr[i].x -= this.speed;  //shot move left
                 }
                 this.shot_check_move = 0;
-            }else if(this.x <= this.current_x) //player move left
+            }else if(this.x <= this.previous_x) //player move left
             {
                 for(let i =0; i<this.shot_arr.length; i++)
                 {
@@ -714,7 +1001,7 @@ class player_class
         }
     }
 
-    count_shot()
+    count_shot(img_shot)
     {
         for (let i =0; i < this.shot_arr.length; i++)
         {
@@ -766,8 +1053,9 @@ class player_class
         push();
         fill(255);
         textSize(40);
-        text("SHOT : "+this.num_shot,300,50);
+        text(this.num_shot,1105,height-12);
         pop();
+        image(img_shot,1050,height-47,40,40);
     }
 
     create_shooting_location_arr()
@@ -776,14 +1064,34 @@ class player_class
         {
             if(keyCode == 32){
                 var direction = this.change_move;
-                if(this.change_move == 0)
+                if(this.image_change==2||this.image_change==5)
                 {
-                    this.shooting_location_arr.push(new Vec2(this.x,this.y+40,direction));
-                }else if(this.change_move == 1)
+                    if(this.change_move == 0)
+                    {
+                        this.jet_shooting_arr.push(new Vec2(this.x,this.y+40,direction));
+                        this.jet_shooting_arr.push(new Vec2(this.x+30,this.y+40+20,direction));
+                        this.jet_shooting_arr.push(new Vec2(this.x+60,this.y+40+30,direction));
+                        this.jet_shooting_arr.push(new Vec2(this.x+30,this.y+40-20,direction));
+                        this.jet_shooting_arr.push(new Vec2(this.x+60,this.y+40-30,direction));
+
+                    }else if(this.change_move == 1)
+                    {
+                        this.jet_shooting_arr.push(new Vec2(this.x+40+60,this.y+40,direction));
+                        this.jet_shooting_arr.push(new Vec2(this.x+40+30,this.y+40+20,direction));
+                        this.jet_shooting_arr.push(new Vec2(this.x+40,this.y+40+30,direction));
+                        this.jet_shooting_arr.push(new Vec2(this.x+40+30,this.y+40-20,direction));
+                        this.jet_shooting_arr.push(new Vec2(this.x+40,this.y+40-30,direction));
+                    }
+                }else
                 {
-                    this.shooting_location_arr.push(new Vec2(this.x+80,this.y+40,direction));
+                    if(this.change_move == 0)
+                    {
+                        this.shooting_location_arr.push(new Vec2(this.x,this.y+40,direction));
+                    }else if(this.change_move == 1)
+                    {
+                        this.shooting_location_arr.push(new Vec2(this.x+80,this.y+40,direction));
+                    }
                 }
-                
             }
         }
     }
@@ -802,47 +1110,223 @@ class player_class
                 {
                     this.shooting_location_arr[i].addTo(this.shot_speed);
                 }
+                
+            }
+        }
+        for(let i =0; i<this.jet_shooting_arr.length; i++)
+        {
+            if(this.jet_shooting_arr[i].x > 0-100 && this.jet_shooting_arr[i].x < 1200+100)
+            {
+                if(this.jet_shooting_arr[i].z == 0)
+                {
+                    this.jet_shooting_arr[i].subtractFrom(this.shot_speed);
+                }
+                if(this.jet_shooting_arr[i].z == 1)
+                {
+                    this.jet_shooting_arr[i].addTo(this.shot_speed);
+                }
+                
             }
         }
     }
 
-    real_shot()
+    real_shot(img_player_shot)
     {
-        for(let i =0; i<this.shooting_location_arr.length; i++)
+        if(this.image_change == 5 || this.image_change == 2)
         {
-            if(this.image_change == 5 || this.image_change == 2) //zet attack
+            for(let i = 0; i<this.jet_shooting_arr.length; i++)
             {
-                if(this.shooting_location_arr[i].z == 0) //left
-                {
-                    //center
-                    circle(this.shooting_location_arr[i].x,this.shooting_location_arr[i].y,20);
-                    //above
-                    circle(this.shooting_location_arr[i].x+30,this.shooting_location_arr[i].y-20,20);
-                    circle(this.shooting_location_arr[i].x+60,this.shooting_location_arr[i].y-30,20);
-                    //below
-                    circle(this.shooting_location_arr[i].x+30,this.shooting_location_arr[i].y+20,20);
-                    circle(this.shooting_location_arr[i].x+60,this.shooting_location_arr[i].y+30,20);
+                image(img_player_shot,this.jet_shooting_arr[i].x-10,this.jet_shooting_arr[i].y-10,20,20);
+            }
+        }else
+        {
+            for(let i =0; i<this.shooting_location_arr.length; i++)
+            {
+                image(img_player_shot,this.shooting_location_arr[i].x-15,this.shooting_location_arr[i].y-15,30,30);
+            }
+        }
+    }
 
-                }else if(this.shooting_location_arr[i].z == 1) //right
+    gauge_bar()
+    {
+        push();
+        fill(255);
+        textSize(45);
+        text(this.gauge_score,567,45);
+        pop();
+
+        push();
+        fill('red');
+        noStroke();
+        rect(this.gauge_x+this.gauge_change_x,7,this.gauge_length,40);
+        pop();
+
+        push();
+        noFill();
+        stroke(255);
+        strokeWeight(3);
+        rect(650,6,530,42);
+        pop();
+            
+        this.gauge_length=floor(map(this.gauge_score, 0,100, 0,530,true));
+        this.gauge_change_x=530-this.gauge_length;
+
+        if(this.gauge_score<0)
+        {
+            this.gauge_score=0;
+        }
+    }
+
+    particle_shot_collision(explosion) 
+    {
+        if(this.shooting_location_arr.length>0)
+        {
+            for(var i = 0; i < this.shooting_location_arr.length; i++)
+            {
+                if(this.shooting_location_arr[i].check_particle_shot_collision(explosion))
                 {
-                    //center
-                    circle(this.shooting_location_arr[i].x,this.shooting_location_arr[i].y,20);
-                    //above
-                    circle(this.shooting_location_arr[i].x-30,this.shooting_location_arr[i].y-20,20);
-                    circle(this.shooting_location_arr[i].x-60,this.shooting_location_arr[i].y-30,20);
-                    //below
-                    circle(this.shooting_location_arr[i].x-30,this.shooting_location_arr[i].y+20,20);
-                    circle(this.shooting_location_arr[i].x-60,this.shooting_location_arr[i].y+30,20);
+                    this.shooting_location_arr.splice(i,1);
                 }
             }
-            else
+        }
+        if(this.jet_shooting_arr.length>0)
+        {
+            for(var i = 0; i < this.jet_shooting_arr.length; i++)
             {
-                circle(this.shooting_location_arr[i].x,this.shooting_location_arr[i].y,30);
+                if(this.jet_shooting_arr[i].check_particle_shot_collision(explosion))
+                {
+                    this.jet_shooting_arr.splice(i,1);
+                }
             }
-            
         }
     }
 
+    planet_shot_collision(planet_arr)
+    {
+        if(this.shooting_location_arr.length>0)
+        {
+            for(var i = 0; i < this.shooting_location_arr.length; i++)
+            {
+                if(this.shooting_location_arr[i].check_planet_shot_collision(planet_arr))
+                {
+                    this.shooting_location_arr.splice(i,1);
+                }
+            }
+        }
+        if(this.jet_shooting_arr.length>0)
+        {
+            for(var i = 0; i < this.jet_shooting_arr.length; i++)
+            {
+                if(this.jet_shooting_arr[i].check_planet_jet_shot_collision(planet_arr))
+                {
+                    this.jet_shooting_arr.splice(i,1);
+                }
+            }
+        }
+    }
+
+    bomb_shot_collision(bomb_arr)
+    {
+        if(this.shooting_location_arr.length>0)
+        {
+            for(var i = 0; i < this.shooting_location_arr.length; i++)
+            {
+                if(this.shooting_location_arr[i].check_bomb_shot_collision(bomb_arr))
+                {
+                    this.shooting_location_arr.splice(i,1);
+                }
+            }
+        }
+        if(this.jet_shooting_arr.length>0)
+        {
+            for(var i = 0; i < this.jet_shooting_arr.length; i++)
+            {
+                if(this.jet_shooting_arr[i].check_bomb_jet_shot_collision(bomb_arr))
+                {
+                    this.jet_shooting_arr.splice(i,1);
+                }
+            }
+        }
+    }
+
+
+    player_planet_collision(planet_arr)
+    {
+        for(let i =0; i<planet_arr.length; i++)
+        {
+            if(this.check_player_planet_collision==0)
+            {
+                if(planet_arr[i].z==1)
+                {
+                    if(dist(this.x+40,this.y+40,planet_arr[i].x+40,planet_arr[i].y+40)<=80)
+                    {
+                        this.check_player_planet_collision=1;
+                    }
+                }
+
+            }if(this.check_player_planet_collision==1)
+            {
+                if(this.gauge_score>0)
+                {
+                    if(this.image_change == 0 || this.image_change == 2 || this.image_change == 3 || this.image_change == 5)
+                    this.gauge_score-=7;
+                }
+                this.check_player_planet_collision=2;
+                this.planet_collision_i=i;
+                this.check_planet_collision_i=1;
+            }
+        }
+        if(this.check_planet_collision_i==1)
+        {
+            if(this.check_player_planet_collision==2)
+            {
+                if(dist(this.x+40,this.y+40,planet_arr[this.planet_collision_i].x+40,planet_arr[this.planet_collision_i].y+40)>80)
+                {
+                    this.check_player_planet_collision=0;
+                    this.check_planet_collision_i=0;
+                }
+            }
+        }
+    }
+
+    player_bomb_collision(bomb_arr)
+    {
+        for(let i =0; i<bomb_arr.length; i++)
+        {
+            if(this.check_player_bomb_collision==0)
+            {
+                if(bomb_arr[i].z==1)
+                {
+                    if(dist(this.x+40,this.y+40,bomb_arr[i].x+40,bomb_arr[i].y+40)<=80)
+                    {
+                        this.check_player_bomb_collision=1;
+                    }
+                }
+
+            }if(this.check_player_bomb_collision==1)
+            {
+                if(this.gauge_score>0)
+                {
+                    if(this.image_change == 0 || this.image_change == 2 || this.image_change == 3 || this.image_change == 5)
+                    this.gauge_score-=7;
+                }
+                this.check_player_bomb_collision=2;
+                this.bomb_collision_i=i;
+                this.check_bomb_collision_i=1;
+            }
+        }
+        if(this.check_bomb_collision_i==1)
+        {
+            if(this.check_player_bomb_collision==2)
+            {
+                if(dist(this.x+40,this.y+40,bomb_arr[this.bomb_collision_i].x+40,bomb_arr[this.bomb_collision_i].y+40)>80)
+                {
+                    this.check_player_bomb_collision=0;
+                    this.check_bomb_collision_i=0;
+                }
+            }
+        }
+    }
 }
     
 

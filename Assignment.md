@@ -1,3 +1,8 @@
+Name       : Yeaseul Lim <br>
+Assignment : Make a Game <br>
+Course     : CS099 <br>
+Spring 2021
+
 # CS099 Final Project - Make a Game
 
 Using your programming knowledge and p5.js, you are to make your own game.
