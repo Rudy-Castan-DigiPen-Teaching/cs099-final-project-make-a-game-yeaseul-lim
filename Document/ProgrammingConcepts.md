@@ -173,7 +173,7 @@ Spring 2021
                 }
         ```
 ### 6. Functions
-    
+    A function is like giving life to the object I want to create because it creates how it actually behaves. A function contains several conditions and loops, and it can also take variables or other functions. It is used by calling setup() or draw() of sketch.js.
 - Functions used by player_class
     - player_image : A function that changes the player's image according to the player's movement.
         ```javascript
@@ -245,12 +245,41 @@ Spring 2021
             }
         ```
 ### 7. Classes
-- player_class : 
+    Classes are used to group similar functions or variables. This makes it easier to distinguish functions from variables, which increases efficiency. I can also get functions or variables from another class from a class. Create a class file, create a constructor, create variables, and create functions. It is then called and used by sketch.js.
+- I made each class of monster, player, particles, planet, Vector.
+    ```javascript
+        //player.js
+        class player_class
+        {
+            constructor(x,y)
+            {
+                this.x = x;
+                this.y = y;
+            }
+        }
 
-- planet_class
-- monster_class
-- Vec2
-- particle
+        //sketch.js
+        player1 = new player_class(1050,400);
+    ```
 
 ### 8. Arrays
+    Array has values for each index. Arrays are highly utilized because they can be added or removed using push or splice. I made arrays using loops. It was used to indicate the location of planets, bombs, particles, traps, and so on.
+- Arrays used by player_class
+    - defence_arr : The coordinates in the array were used to display images of defensive items on the screen.
+        ```javascript
+            defence_image(img_defence)
+            {
+                for (let j = 0; j < this.base_defence; j++)
+                {   
+                    if(this.defence_arr[j].z == 0)
+                    {
+                        this.defence_arr[j].z = 1;
+                    }
+                    if(this.defence_arr[j].z == 1)
+                    {
+                        image(img_defence, this.defence_arr[j].x,this.defence_arr[j].y,40,40);
+                    }
+                }
+            }
+        ```
 > 
